@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Header from "./components/Header";
 import OutputDisplay from "./components/OutputDisplay";
+import { weatherService } from "./services/weatherService";
 
 function App() {
   const [weather, setWeather] = useState(null);
@@ -10,31 +11,12 @@ function App() {
   const [loading, setLoading] = useState("");
 
   useEffect(() => {
-    async function getWeather() {
-      if (!city) return;
-      try {
-        const response = await fetch("http://localhost:3000/api/weather", {
-          method: "POST",
-          headers: {
-            "content-Type": "application/json",
-          },
-          body: JSON.stringify({ city }),
-        });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-          throw new Error(data.message);
-        }
-
-        setWeather(data);
-      } catch (error) {
-        setError(error.message);
-      } finally {
-        setLoading("");
-      }
-    }
-    getWeather();
+    if (!city) return;
+    weatherService
+      .getWeatherByCity(city)
+      .then((data) => setWeather(data))
+      .catch((error) => setError(error.message))
+      .finally(() => setLoading(""));
   }, [city]);
 
   const handleSet = () => {
