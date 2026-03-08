@@ -2,10 +2,12 @@ import React from 'react'
 
 const Input = () => {
   return (
-    <div className='input-area'>
-        <p>LOCATION/CITY</p>
-        <input type="text" placeholder='Enter ' />
-        <button>SET</button>
+    <div className="location-section">
+        <label className="label-text">LOCATION</label>
+        <div className="input-wrapper">
+            <input type="text" placeholder='Enter City' />
+            <button className="set-btn">SET</button>
+        </div>
     </div>
   );
 }
