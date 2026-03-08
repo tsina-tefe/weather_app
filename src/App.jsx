@@ -7,6 +7,7 @@ function App() {
   const [city, setCity] = useState("");
   const [input, setInput] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState("");
 
   useEffect(() => {
     async function getWeather() {
@@ -19,24 +20,37 @@ function App() {
           },
           body: JSON.stringify({ city }),
         });
-        if (!response.ok) {
-          const error = await response.json();
-          const errorMessage = error.message;
-          throw new Error(errorMessage);
-        }
+
         const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.message);
+        }
 
         setWeather(data);
       } catch (error) {
         setError(error.message);
+      } finally {
+        setLoading("");
       }
     }
     getWeather();
   }, [city]);
 
   const handleSet = () => {
+    if (input.trim() === "") {
+      setError("Please enter location");
+      return;
+    }
+    setLoading("Loading...");
     setCity(input.trim());
     setInput("");
+  };
+
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter") {
+      handleSet();
+    }
   };
 
   return (
@@ -47,11 +61,15 @@ function App() {
           <label className="label-text">LOCATION</label>
           <div className="input-wrapper">
             <input
+              value={input}
               type="text"
               placeholder="Enter City"
               onChange={(e) => {
                 setInput(e.target.value);
                 setError("");
+              }}
+              onKeyDown={() => {
+                handleKeyDown(event);
               }}
             />
             <button className="set-btn" onClick={handleSet}>
@@ -59,6 +77,7 @@ function App() {
             </button>
           </div>
           <p className="error">{error ? error : ""}</p>
+          <p className="loading">{loading ? loading : ""}</p>
         </div>
         <OutputDisplay weather={weather} />
       </div>
